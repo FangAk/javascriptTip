@@ -1,0 +1,2 @@
+# javascriptTip
+日常
