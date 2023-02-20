@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    body {
+      background: black;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    #canvas {
+      margin: 40vh;
+      width: 5vw;
+      height: 10vh;
+    }
+  </style>
+
+  <body>
+    <canvas id="canvas"></canvas>
+  </body>
+  <script>
+    // Array.of
+    const arr = Array.of({ 1: "1" }, { 2: "2" }, { 3: "3" });
+    console.log(arr);
+    // f(1, 2, 3) // 3
+    // f(1) // 1
+    // f() // 0
+    function fun() {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          resolve(1);
+        }, 2000);
+      });
+    }
+    function fun2() {
+      return new Promise(function (resolve, reject) {
+        resolve(2);
+      });
+    }
+    async function run() {
+      try {
+        let data1 = await Promise.all([fun(), fun2()]);
+        let data = await fun();
+        let data2 = await fun2();
+        console.log(data1);
+        console.log(data);
+        console.log(data2);
+      } catch (e) {
+        console.log(e); // catch error test
+      }
+    }
+    const a = [1, 2];
+    a.length && run();
+
+    //顶层 await
+    const fnc = (timeout) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, timeout);
+      });
+    };
+
+    // await fnc(3000);
+
+    // 输入：nums = [2,7,11,15], target = 9
+    // 输出：[0,1]
+    function geytnum(nums, target) {
+      let map = new Map();
+      for (let i = 0; i < nums.length; i++) {
+        let num = nums[i];
+        let num2 = target - num;
+        console.log(num2);
+        if (map.has(num2)) {
+          return [map.get(num2), i];
+        }
+        map.set(num, i);
+      }
+    }
+    console.log(geytnum([2, 7, 11, 15], 9));
+
+    // 输入：l1 = [2, 4, 3], l2 = [5, 6, 4]
+    // 输出：[7, 0, 8]
+
+    let l1 = [2, 4, 3],
+      l2 = [5, 6, 4];
+    function addTwoNumbers(l1, l2) {
+      let l3 = new ListNode(0);
+      let p = l1,
+        q = l2,
+        curr = l3;
+      let carry = 0;
+      while (p != null || q != null) {
+        let x = p != null ? p.val : 0;
+        let y = q != null ? q.val : 0;
+        let sum = carry + x + y;
+        carry = Math.floor(sum / 10);
+        curr.next = new ListNode(sum % 10);
+        curr = curr.next;
+        if (p != null) p = p.next;
+        if (q != null) q = q.next;
+      }
+      if (carry > 0) {
+        curr.next = new ListNode(carry);
+      }
+      return l3.next;
+    }
+
+    //雪花飘落
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var w = (canvas.width = window.innerWidth);
+    var h = (canvas.height = window.innerHeight);
+    var num = 200;
+    var snows = [];
+    var snow = function () {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.r = Math.random() * 4 + 1;
+      this.d = Math.random() * num;
+      this.color = "rgba(255,255,255," + (Math.random() * 0.5 + 0.3) + ")";
+    };
+    snow.prototype.draw = function () {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    };
+    for (var i = 0; i < num; i++) {
+      snows.push(new snow());
+    }
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < num; i++) {
+        var s = snows[i];
+        s.y += Math.cos(s.d) + 1 + s.r / 2;
+        s.x += Math.sin(s.d) * 2;
+        if (s.x > w + 5 || s.x < -5 || s.y > h) {
+          if (i % 3 > 0) {
+            snows[i] = new snow();
+          } else {
+            if (Math.sin(s.d) > 0) {
+              snows[i].x = -5;
+              snows[i].y = Math.random() * h;
+            } else {
+              snows[i].x = w + 5;
+              snows[i].y = Math.random() * h;
+            }
+          }
+        }
+        snows[i].draw();
+      }
+    }
+    setInterval(draw, 33);
+
+    function args(...args) {
+      let map = new Map();
+
+      let data = new Set(args);
+
+      console.log(data);
+      for (const i of data) {
+        console.log(i);
+      }
+    }
+    args(1, 2, 1, 6, 1);
+
+    //获取当前时间
+    function gettime() {
+      var time = new Date();
+      var year = time.getFullYear();
+      var month = time.getMonth() + 1;
+      var day = time.getDate();
+      var hour = time.getHours();
+      var minute = time.getMinutes();
+      var second = time.getSeconds();
+      var week = time.getDay();
+
+      var weekArr = ["日", "一", "二", "三", "四", "五", "六"];
+      var weekStr = "星期" + weekArr[week];
+      var timeStr =
+        year +
+        "年" +
+        month +
+        "月" +
+        day +
+        "日" +
+        " " +
+        hour +
+        ":" +
+        minute +
+        ":" +
+        second +
+        " " +
+        weekStr;
+      console.log(timeStr);
+    }
+    gettime();
+
+    // 防抖
+    function debounce(fn, delay) {
+      let timeout = null;
+      return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          fn.apply(this, arguments);
+        }, delay);
+      };
+    }
+
+    // 节流
+    function throttle(fn, delay) {
+      let run = true; // 开关
+      return function () {
+        if (!run) {
+          return;
+        }
+        run = false;
+        setTimeout(() => {
+          fn.apply(this, arguments);
+          run = true;
+        }, delay);
+      };
+    }
+
+    // throttle(printPos(), 1000);
+
+    let dasd = ["", 1, 5];
+    console.log(dasd.filter(Boolean));
+    function throttle(fn, delay) {
+      let flag = true;
+      return () => {
+        if (!flag) {
+          return;
+        }
+        flag = false;
+        setTimeout(() => {
+          fn.apply(this, fn);
+          flag = true;
+        }, delay);
+      };
+    }
+
+    const ll = "k";
+    function ll2() {
+      console.log("das");
+    }
+    console.log(ll && ll2());
+
+    const lllll = ["就打算离开", "djsakjdsa", "合计"];
+    const kflak = lllll.pop();
+    console.log(kflak.concat(lllll));
+
+  
+    console.log(timeChange(7272));
+  </script>
+</html>

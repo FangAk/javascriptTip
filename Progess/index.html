@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    img {
+      width: 300px;
+      height: 300px;
+    }
+  </style>
+  <body>
+    <div id="box">
+      <input type="file" name="" id="file" multiple />
+    </div>
+  </body>
+  <script>
+    let file = document.getElementById("file");
+    let img = document.createElement("img");
+    let formData = new FormData();
+    //多选文件上传
+    file.addEventListener("change", function () {
+      let files = this.files;
+      console.log(files);
+      for (let i = 0; i < files.length; i++) {
+        formData.append("file", files[i]);
+      }
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:5000/images");
+      xhr.send(formData);
+      xhr.onload = function () {
+        console.log(xhr.response);
+      };
+      xhr.onprogress = (e) => {
+        if (e.loaded && e.total) {
+          const percent = (event.loaded / event.total) * 100;
+          console.log(`上传进度: ${Math.round(percent)} %`);
+        }
+      };
+    });
+    // file.addEventListener("change", function () {
+    //   let file = this.files[0];
+    //   console.log(file);
+    //   formData.append("file", file);
+    //   let xhr = new XMLHttpRequest();
+    //   xhr.open("POST", "http://localhost:5000/images");
+    //   xhr.send(formData);
+    //   xhr.onload = function () {
+    //     console.log(xhr.response);
+    //   };
+    //   xhr.onprogress = (e) => {
+    //     if (e.loaded && e.total) {
+    //       const percent = (event.loaded / event.total) * 100;
+    //       console.log(`上传进度: ${Math.round(percent)} %`);
+    //     }
+    //   };
+    // });
+
+    // file.addEventListener("change", function () {
+    //   let file = this.files[0];
+    //   console.log(file);
+    //   let reader = new FileReader();
+    //   reader.readAsDataURL(file);
+    //   console.log(reader);
+    //   reader.onload = function () {
+    //     img.src = reader.result;
+    //     document.body.appendChild(img);
+    //   };
+    //   reader.onprogress = (e) => {
+    //     if (e.loaded && e.total) {
+    //       const percent = (event.loaded / event.total) * 100;
+    //       console.log(`上传进度: ${Math.round(percent)} %`);
+    //     }
+    //   };
+    // });
+  </script>
+</html>

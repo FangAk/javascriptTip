@@ -1,0 +1,46 @@
+/* 导航条元素靠左 */
+.lay-left{
+    position: absolute !important;
+    left: 30px;
+}
+/* 导航条元素右浮动（主页） */
+.lay-right{
+    float: right !important;
+}
+/* 导航条元素右定位（登陆页） */
+.lay-pos{
+    position: absolute !important;
+    right: 20px;
+}
+/* 导航元素居中 */
+.layui-nav{
+    text-align: center;
+}
+/* 表单 */
+.layui-form{
+    margin: 50px auto;
+}
+@media all and (min-width:600px){
+    .layui-form{ width: 80vw; }
+}
+@media all and (min-width:800px){
+    .layui-form{  width: 60vw; }
+}
+@media all and (min-width:1200px){
+    .layui-form{ width: 40vw; }
+}
+/* 表单必选项标记 */
+.required{
+    color: red;
+}
+.layui-icon-ok-circle{
+    color: green;
+}
+.layui-icon-close-fill{
+    color: red;
+}
+/* 评论图标 */
+.layui-icon-reply-fill{
+    cursor: pointer;
+    color: green;
+}

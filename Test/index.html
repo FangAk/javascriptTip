@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body></body>
+  <script>
+    var myObject = {
+      foo: 1,
+      bar: 2,
+      get baz() {
+        return this.foo + this.bar;
+      },
+    };
+    console.log(
+      Reflect.get(myObject, "foo"),
+      Reflect.get(myObject, "bar"),
+      Reflect.get(myObject, "baz")
+    );
+    console.log(Reflect.has(myObject, "foo"));
+
+    console.log(myObject.hasOwnProperty("foo"));
+
+    Array.prototype.groupBy = function (callback) {
+      const object = {};
+      for (let i = 0; i < this.length; i++) {
+        let key = callback(this[i], i, this);
+        if (object[key]) {
+          object[key].push(this[i]);
+        } else {
+          object[key] = [this[i]];
+        }
+      }
+      return object;
+    };
+    Array.prototype.Group = function (arr = [], key) {
+      return key
+        ? arr.reduce(
+            (t, v) => (!t[v[key]] && (t[v[key]] = []), t[v[key]].push(v), t),
+            {}
+          )
+        : {};
+    };
+    let sum2 = [
+      {
+        name: "里",
+        age: 15,
+      },
+      {
+        name: "外",
+        age: 15,
+      },
+      {
+        name: "里",
+        age: 16,
+      },
+    ];
+    console.log(
+      sum2.reduce(
+        (t, v) => (
+          !t[v["name"]] && (t[v["name"]] = []), t[v["name"]].push(v), t
+        ),
+        {}
+      )
+    );
+
+    let array = [23, 56, 78, 42, 11, 49, 99];
+    Object.freeze(array);
+    array[0] = 25;
+    console.log(array.at(0));
+    let a = array.groupBy((item, index) => {
+      return item % 2 == 0 ? "even" : "odd";
+    });
+    console.log(a);
+    let Some = array.some((item, index) => {
+      return item % 2 == 0;
+    });
+    console.log(Some, "some"),
+      array.every((item, index) => {
+        console.log(item % 2 == 0, "every");
+      });
+    console.dir(Array);
+    console.dir(Object);
+    let sum = array.reduce((acc, item) => {
+      return acc + item;
+    }, 0);
+    console.table({ sum: sum });
+    console.assert(sum == 400, "sum is not 400");
+
+    for (let key of array.keys()) {
+      console.log(key);
+    }
+    for (let key of array.values()) {
+      console.log(key);
+    }
+    array.forEach((v) => {
+      let test = [v].entries();
+      console.log(test.next().value);
+    });
+    console.log("length" in array);
+    let object = {
+      name: "张三",
+      age: 18,
+    };
+
+    ("use strict");
+    Object.freeze(object);
+    class Test {
+      constructor(name, age) {
+        this.name = name;
+        this.age = age;
+        this.add = (a, b) => {
+          return a + b;
+        };
+      }
+    }
+    class Test1 extends Test {
+      constructor(name, age) {
+        super(name);
+        this.age = age + 3;
+      }
+    }
+
+    console.log(new Test1("张三", 18));
+    console.log(Reflect.ownKeys([1, 2]));
+    console.log(Object.getOwnPropertyNames([1, 2]));
+    console.log(Object.entries(object));
+    object.name = "李四";
+    console.log(object.name);
+
+    console.log("/////////////////////");
+    console.log(Object.isExtensible(Test));
+
+    async function fun() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve("hello");
+        }, 1000);
+      });
+    }
+    async function fun1() {
+      let a = await fun();
+      console.log(a);
+    }
+    fun1();
+    console.log(Number.EPSILON);
+
+    let ta = [1, 5, 4, 6];
+    console.log(3 << 2);
+
+    void (function iife() {
+      console.log("helloaa");
+    })();
+
+    let jQuery;
+    try {
+      jQuery = undefined;
+      throw new Error("jQuery is not defined");
+    } catch {
+      jQuery = 0 + "1";
+    }
+    console.log(jQuery);
+
+    let all = "hello";
+    console.log(all.padStart(10, "*"));
+    Object.seal(all);
+    all = 2;
+
+    var entries = [1, [2, 5], [6, 7], 9];
+    var flat_entries = [].concat(...entries);
+    console.log(flat_entries);
+    console.log(entries.flat());
+
+    String.prototype.reverse = function () {
+      return [...this].reverse().join("");
+    };
+    let str = "reduce最牛逼";
+    console.log(str.reverse());
+    let iii = [...str].reverse().join("");
+    console.log(iii);
+    let adddf = "";
+    for (let index = 0; index < str.length; index++) {
+      adddf += str[str.length - index - 1];
+    }
+    console.log(adddf);
+    console.log([...str].reduce((v, i) => i + v));
+
+    function HashMap() {
+      this.map = {};
+    }
+    HashMap.prototype = {
+      put: function (key, value) {
+        // 向Map中增加元素（key, value)
+        this.map[key] = value;
+      },
+      get: function (key) {
+        //获取指定Key的元素值Value，失败返回Null
+        if (this.map.hasOwnProperty(key)) {
+          return this.map[key];
+        }
+        return null;
+      },
+      remove: function (key) {
+        // 删除指定Key的元素，成功返回True，失败返回Falsevvvvvvvvvvvvvvvvvvvvvv
+        if (this.map.hasOwnProperty(key)) {
+          return delete this.map[key];
+        }
+        return false;
+      },
+      removeAll: function () {
+        //清空HashMap所有元素
+        this.map = {};
+      },
+      keySet: function () {
+        //获取Map中所有KEY的数组（Array）
+        var _keys = [];
+        for (var i in this.map) {
+          _keys.push(i);
+        }
+        return _keys;
+      },
+    };
+    HashMap.prototype.constructor = HashMap;
+
+    var map = new HashMap();
+    map.put("key1", "Value1");
+    console.log(map.get("key1"), map.keySet());
+
+    let url = { user: "1", password: "123", name: "张三" };
+    const resturl = (url) => {
+      let str = "?";
+      for (const key in url) {
+        if (url.hasOwnProperty(key)) {
+          const element = url[key];
+          str += `${key}=${element}&`;
+        }
+      }
+      return str.slice(0, -1);
+    };
+
+    let resturl2 = resturl(url);
+    console.log(resturl2);
+
+    let urltw1 = "?user=1&password=123&name=张三";
+    const resturl3 = (url) => {
+      let str = url.slice(1);
+      let arr = str.split("&");
+      let obj = {};
+      arr.forEach((v) => {
+        let arr2 = v.split("=");
+        obj[arr2[0]] = arr2[1];
+      });
+      return obj;
+    };
+    console.log(resturl3(urltw1));
+
+    // Array.prototype.constructor 示例
+    var arr = new Array(1, 2, 3);
+    // arr = arr.map((v, i) => [i, v])
+    console.log(arr);
+    console.log(arr.constructor);
+    console.log(arr.constructor === Array); // true
+    console.log(arr.constructor === Object); // false
+    console.log(arr.constructor === Function); // false
+
+    const change = ((v) => {
+      console.log(...v);
+    })("dasdsa");
+
+    console.log("////////////////");
+
+    /**
+     * 深拷贝
+     * @param {Object|Array} target  拷贝对象
+     * @returns {Object|Array} result 拷贝结果
+     */
+    function deepCopy(target) {
+      if (Array.isArray(target)) {
+        // 处理数组
+        return target.map((item) => deepCopy(item));
+      }
+
+      if (Object.prototype.toString.call(target) === "[object Object]") {
+        // 处理对象
+        // 先将对象转为二维数组，再将二维数组转回对象（这个过程还是浅拷贝）
+        // 所以使用map方法将二维数组里的元素进行深拷贝完了再转回对象
+        return Object.fromEntries(
+          Object.entries(target).map(([k, v]) => [k, deepCopy(v)])
+        );
+      }
+      return target; // 深拷贝要处理的就是引用类型内部属性会变化的情况，像正则、Error、函数、Date这种一般不会发生变化的直接返回原数据就可以
+    }
+    const Objlist = {
+      name: "张三",
+      age: 18,
+    };
+    console.log(deepCopy(Objlist));
+
+    function pdf() {
+      // 避免出现浏览器滚动条导致的内容不全处理
+      document.body.scrollTop = 0;
+      //div内部滚动导致内容不全处理
+      document.getElementById("app").style.height = "auto";
+      setTimeout(() => {
+        html2canvas(document.getElementById("upload"), {
+          background: "#FFF",
+          allowTaint: true,
+          height: document.getElementById("upload").scrollHeight,
+          windowHeight: document.getElementById("upload").scrollHeight,
+        }).then((canvas) => {
+          var contentWidth = canvas.width;
+          var contentHeight = canvas.height;
+
+          //一页pdf显示html页面生成的canvas高度;
+          var pageHeight = (contentWidth / 592.28) * 841.89;
+          //未生成pdf的html页面高度
+          var leftHeight = contentHeight;
+          //页面偏移
+          var position = 0;
+          //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+          var imgWidth = 595.28;
+          var imgHeight = (592.28 / contentWidth) * contentHeight;
+
+          var pageData = canvas.toDataURL("image/jpeg", 1.0);
+
+          var pdf = new jsPDF("p", "pt", "a4");
+
+          //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+          //当内容未超过pdf一页显示的范围，无需分页
+          if (leftHeight < pageHeight) {
+            pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
+          } else {
+            while (leftHeight > 0) {
+              pdf.addImage(pageData, "JPEG", 0, position, imgWidth, imgHeight);
+              leftHeight -= pageHeight;
+              position -= 841.89;
+              //避免添加空白页
+              if (leftHeight > 0) {
+                pdf.addPage();
+              }
+            }
+          }
+          pdf.save("content.pdf");
+          document.getElementById("app").style.height = "100%";
+        });
+      }, 300);
+    }
+
+    let str2 = str.replace(/\\/g, "");
+    console.log(str2);
+
+    //函数柯里化
+    function curry(fn, ...args) {
+      return fn.length > args.length
+        ? (..._args) => curry(fn, ...args, ..._args)
+        : fn(...args);
+    }
+   
+  </script>
+</html>

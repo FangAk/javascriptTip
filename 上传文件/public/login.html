@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录页</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <ul class="layui-nav layui-bg-cyan" lay-filter="" lay-bar="disabled">
+        <li class="layui-nav-item lay-left">
+            <a href="./index.html"><i class="layui-icon layui-icon-return"></i></a>
+        </li>
+        <li class="layui-nav-item">登录</li>
+        <li class="layui-nav-item lay-pos">
+            <a href="./register.html">去注册</a>
+        </li>
+    </ul>
+
+    <!-- 表单 -->
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名<i class="required">*</i></label>
+            <div class="layui-input-inline">
+                <input type="text" name="account" required lay-verify="required" placeholder="请输入标题" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux acc-sign">汉字或字母开头,2-8位</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码<i class="required">*</i></label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux pas-sign">字母数字,3-12位</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即登录</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <!-- layui插件 和 公用逻辑-->
+    <script src="./layui/layui.js"></script>
+    <script src="./js/common.js"></script>
+    <script>
+        layui.use(['form', 'jquery', 'layer'], function () {
+            var form = layui.form;
+            var $ = layui.jquery;
+            var layout = layui.layer;
+           
+            //监听提交
+            form.on('submit', function (data) {
+                console.log(data.field)
+
+                // 账号正则
+                var accExp = /^[\u4E00-\u9FA5A-Za-z].{1,7}$/;
+                if (accExp.test(data.field.account)) {
+                    $(".acc-sign").html("<i class='layui-icon layui-icon-ok-circle'></i>")
+                } else {
+                    $(".acc-sign").html("<i class='layui-icon layui-icon-close-fill'></i>")
+                    layer.msg('账号必须以汉字或字母开头且长度在2到8之间',{icon: 5})
+                    return false;// 结束，并阻止表单自动提交
+                }
+
+                // 密码正则
+                var pasExp = /^[0-9A-Za-z]{3,12}$/;
+                if (pasExp.test(data.field.password)) {
+                    $(".pas-sign").html("<i class='layui-icon layui-icon-ok-circle'></i>")
+                } else {
+                    $(".pas-sign").html("<i class='layui-icon layui-icon-close-fill'></i>")
+                    layer.msg('密码必须以字母开头且长度在3到12之间',{icon: 5})
+                    return false;// 结束，并阻止表单自动提交
+                }
+
+                // 发起登陆请求
+                $.post("/login", data.field, function(res){
+                    if(res.code){
+                        layer.alert("登录成功",{icon:1},function(){
+                            // 登录成功后, 把账号存入本地, 用于其他页面登录验证
+                            sessionStorage.setItem("account", data.field.account)
+                            // 返回主页
+                            location.href = "./index.html"
+                        })
+                    }else{
+                        layer.msg(res.data,{icon: 5})
+                    }
+                })
+
+                return false;// 结束，并阻止表单自动提交
+            });
+        });
+    </script>
+</body>
+
+</html>

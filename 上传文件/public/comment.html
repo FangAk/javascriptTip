@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>评论页</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <link rel="stylesheet" href="./css/common.css">
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <ul class="layui-nav layui-bg-cyan" lay-filter="" lay-bar="disabled">
+        <li class="layui-nav-item lay-left">
+            <a href="./index.html"><i class="layui-icon layui-icon-return"></i></a>
+        </li>
+        <li class="layui-nav-item">评论</li>
+    </ul>
+
+    <!-- 表单 -->
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">请输入你的评论</label>
+            <div class="layui-input-block">
+                <textarea name="message" placeholder="请输入内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即评论</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <!-- layui插件 和 公用逻辑-->
+    <script src="./layui/layui.js"></script>
+    <script src="./js/common.js"></script>
+    <script>
+        layui.use(['form', 'jquery', 'layer'], function () {
+            var form = layui.form;
+            var $ = layui.jquery;
+            var layout = layui.layer;
+
+            //监听提交
+            form.on('submit', function (data) {
+                console.log(data.field)
+
+                if (!data.field.message.trim()) {
+                    layer.msg('评论内容不能为空', { icon: 5 })
+                    return false;// 结束，并阻止表单自动提交
+                }
+
+                // 向表单数据中添加 时间 和 评论者 和 评论的动态消息id 这三条数据
+                data.field.time = new Date().toLocaleString();
+                data.field.name = account;
+                data.field.id = sessionStorage.getItem("id")
+                // 发起评论请求 
+                $.post("/comment", data.field, function (res) {
+                    if (res.code) {
+                        layer.alert("评论成功", { icon: 1 }, function () {
+                            location.href = "./index.html"
+                        })
+                    } else {
+                        layer.msg(res.data, { icon: 5 })
+                    }
+                })
+
+                return false;// 结束，并阻止表单自动提交
+            });
+        });
+    </script>
+</body>
+
+</html>

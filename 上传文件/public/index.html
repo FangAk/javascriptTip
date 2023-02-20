@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>主页</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <style>
+        section {
+            width: calc(100% - 60px);
+            margin: 30px;
+            background-color: rgb(214, 169, 137);
+            padding: 20px;
+            border-radius: 20px;
+            box-sizing: border-box;
+        }
+
+        section h2 {
+            display: inline-block;
+            color: rgb(14, 153, 245);
+            vertical-align: middle;
+        }
+
+        section p {
+            font-size: 18px;
+            margin-left: calc(30vw - 100px);
+            text-indent: 2em;
+        }
+
+        section small {
+            display: block;
+            text-align: right;
+            color: #444;
+            position: relative;
+            top: 6px;
+        }
+
+        section img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        div {
+            text-align: center;
+        }
+
+        div h3 {
+            display: inline-block;
+            color: rgb(1, 255, 14);
+            float: right;
+        }
+
+        div time {
+            float: left;
+            font-size: 12px;
+            color: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 导航条 -->
+    <ul class="layui-nav layui-bg-cyan" lay-filter="" lay-bar="disabled">
+        <li class="layui-nav-item lay-left">在线聊天</li>
+        <li class="layui-nav-item">&#x3000;</li>
+        <li class="layui-nav-item lay-right">
+            <div id="loginNo">
+                <a href="./login.html"><i class="layui-icon layui-icon-friends"></i>登录</a>
+            </div>
+            <div id="loginYes">
+                <a href="javascript:;">
+                    <img id="headImg" src="imgs/default.gif" class="layui-nav-img">
+                    <span id="username"></span>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="./uploadImg.html">上传头像</a></dd>
+                    <dd id="logout"><a href="javascript:;">退出登录</a></dd>
+                </dl>
+            </div>
+        </li>
+        <li class="layui-nav-item lay-right">
+            <a href="./publish.html"><i class="layui-icon layui-icon-add-1"></i>发布</a>
+        </li>
+    </ul>
+
+    <main></main>
+    
+
+
+    <!-- layui插件 和 公用逻辑-->
+    <script src="./layui/layui.js"></script>
+    <script src="./js/common.js"></script>
+
+    <script>
+        // 判断登录状态
+        if (account) {
+            // 已登录, 把未登录状态标签删掉
+            document.getElementById("loginNo").remove()
+            document.getElementById("username").innerText = account;
+        } else {
+            // 未登录, 把已登录状态标签删掉
+            document.getElementById("loginYes").remove()
+        }
+
+        layui.use(['jquery', "layer"], function () {
+            var $ = layui.jquery;
+            var layer = layui.layer;
+
+            // 请求所有动态消息和评论消息
+            $.get('/getNews', function (res) {
+                if (res.code) {
+                    console.log(res.data)
+                    // 把数据展示到页面上, 先循环发布的动态
+                    res.data.news.forEach(function (item) {
+                        // 先过滤<和> 防范 XSS(跨站脚本攻击)
+                        item.message = item.message.replace(/</g, '&lt;')
+                        item.message = item.message.replace(/>/g, '&gt;')
+
+                        // 创建动态消息的标签
+                        var section = $("<section>");
+                        section.appendTo("main").html(`
+                            <img src="./imgs/default.gif" alt="">
+                            <h2>${item.name}</h2>
+                            <p>${item.message}</p>
+                            <small> 
+                                <i class="layui-icon layui-icon-reply-fill" data-id='${item.Id}'></i>   
+                                ${item.time}
+                            </small>
+                        `)
+                        // 循环所有评论信息, 对比id, 显示这条动态的评论消息
+                        res.data.comments.forEach(function (comment) {
+                            // 先过滤<和> 防范 XSS(跨站脚本攻击)
+                            comment.message = comment.message.replace(/</g, '&lt;')
+                            comment.message = comment.message.replace(/>/g, '&gt;')
+                            if (item.Id == comment.targetId) {
+                                $("<div>").appendTo(section).html(`
+                                    <hr>
+                                    <h3>${comment.name}</h3>
+                                    <span>${comment.message}</span>
+                                    <time>${comment.time}</time>
+                                `)
+                            }
+                        })
+                    })
+
+
+                    // 在标签创建完成之后, 再给他们绑定事件即可
+                    $(".layui-icon-reply-fill").click(function () {
+                        if (account) {
+                            // 这一条动态对应的id值放到了i标签的自定义属性中
+                            console.log(this.dataset.id)
+                            // 把这个动态消息的id值,存入本地
+                            sessionStorage.setItem("id", this.dataset.id)
+                            location.href = './comment.html'
+                        } else {
+                            layer.msg("请先登录", { icon: 5 })
+                        }
+                    })
+                } else {
+                    layer.msg(res.data)
+                }
+            })
+
+
+            // 评论,在这里给评论图标绑定事件失败, 因为评论图标是在ajax请求回调中创建的, 事件绑定执行时, 标签还未创建,所以绑定失败, 一般有两种解决方案
+            $(".layui-icon-reply-fill").click(function () {
+                console.log("这个地方的事件不会触发")
+            })
+            // 方案一: 把事件绑定下载标签创建之后, 如上所示
+            // 方案二: 使用jQuery语法给未来可能被创建的标签绑定事件, 原理是事件委托, 用已经存在的父标签代理将要创建的子标签的事件
+            $("main").delegate(".layui-icon-reply-fill", "click", function () {
+                console.log("评论")
+            })
+
+
+            // 退出登录
+            $("#logout").click(function () {
+                sessionStorage.removeItem("account");
+                location.reload();
+            })
+
+
+            // 引用动态头像
+            $("#headImg").attr("src", "./imgs/headImg/" + account + ".png")
+
+            // 对于新用户和没有上传过自定义头像的用户来说,找不到头像图片会报错
+            $("#headImg").error(function () {
+                // img标签的src地址找不到图片时,会触发error事件, 设置默认头像
+                console.log("找不到头像")
+                this.src = "imgs/default.gif"
+            })
+
+        })
+
+
+
+
+
+    </script>
+</body>
+
+</html>
