@@ -195,7 +195,7 @@
       }, []);
     };
     console.log(filter([1, 2, 3], (v) => v > 1));
-    //手写 vue中的 watch 返回最新的值 和 旧值
+    // vue中的 watch 返回最新的值 和 旧值
     const watch = (obj, key, cb) => {
       let val = obj[key];
       Object.defineProperty(obj, key, {
