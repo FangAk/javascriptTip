@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <input type="file">
+    </body><script
+        src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+
+
+const input = document.querySelector('input[type="file"]');
+
+input.addEventListener('change', () => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result;
+    const workbook = XLSX.read(data, { type: 'binary' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+    //作为表头
+   const title =Object.values(jsonData[0])
+    console.log(title);
+    //把title每一条数据 作为jsonData后面每条数据的key并把第一条数据删除
+    const dataArr =  jsonData.map((item,index)=>{
+        const obj = {}
+        title.forEach((titleItem,titleIndex)=>{
+            obj[titleItem] = Object.values(item)[titleIndex]
+        })
+        //删除第一条数据并过滤掉空对象
+        return index === 0 ? {} :  obj
+    })
+ console.log(dataArr);
+   
+  };
+
+  reader.readAsBinaryString(input.files[0]);
+});
+</script>
+</html>
