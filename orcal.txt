@@ -1,0 +1,39 @@
+CREATE TABLE "PSH_WATER" (
+    "ID" NUMBER(10,0) NOT NULL,
+    "NAME" VARCHAR2(50 BYTE) NOT NULL,
+    "ADDRESS" VARCHAR2(500 BYTE) NOT NULL,
+     "TOWN" VARCHAR2(500 BYTE) NOT NULL,
+      "DATASOURCE" VARCHAR2(500 BYTE) NOT NULL,
+       "OUTLETTYPE" VARCHAR2(500 BYTE) NOT NULL,
+        "PIPLE" VARCHAR2(500 BYTE) NOT NULL,
+          "SAMPLINGDATE" DATE NOT NULL,
+          "SAMPLINGPERSON" VARCHAR2(500 BYTE) NOT NULL,
+           "PH" VARCHAR2(500 BYTE),
+                 "COD" VARCHAR2(500 BYTE) ,
+                       "AMMONIA" VARCHAR2(500 BYTE) ,
+                             "TOTALPHOSPHORUS" VARCHAR2(500 BYTE) ,
+                                   "TOTALNITROGEN" VARCHAR2(500 BYTE) ,
+                                    "SUSPENDEDSOLIDS" VARCHAR2(500 BYTE) ,
+                                      "PETROLEUM" VARCHAR2(500 BYTE) ,
+                                       "ANIMAL" VARCHAR2(500 BYTE) ,
+                                          "BOD" VARCHAR2(500 BYTE) ,
+                                             "SAMPLEDESCRIPTION" VARCHAR2(500 BYTE) NOT NULL,
+                                              "UPLOADPERSON" NUMBER(10,0) NOT NULL,
+                                                   "UPLOADTIME" DATE NOT NULL,
+    CONSTRAINT "TABLE_NAME" PRIMARY KEY ("ID")
+);
+
+CREATE SEQUENCE PSH_WATER_ID
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 999999999
+NOCYCLE
+NOCACHE;
+
+CREATE OR REPLACE TRIGGER PSH_NAME_ID
+BEFORE INSERT ON "PSH_WATER"
+FOR EACH ROW
+WHEN (NEW."ID" IS NULL)
+BEGIN
+    SELECT PSH_WATER_ID.NEXTVAL INTO :NEW."ID" FROM DUAL;
+END;
