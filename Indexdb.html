@@ -1,8 +1,8 @@
 <!--
  * @Author: ‘Fzz’ 
  * @Date: 2023-04-04 16:56:57
- * @LastEditTime: 2023-04-04 17:21:04
- * @FilePath: \javascriptTip\index2.html
+ * @LastEditTime: 2023-04-04 17:43:00
+ * @FilePath: \javascriptTip\Indexdb.html
  * @Description: Do not edit
 -->
 <!DOCTYPE html>
@@ -23,7 +23,7 @@
     <script>
   // Add event listener to the button
   document.getElementById("myButton").addEventListener("click", function() {
-    const dbName = 'myDatabase';
+const dbName = 'myDatabase';
 const objectStoreName = 'myObjectStore';
 
 // 先打开数据库
@@ -188,9 +188,15 @@ document.getElementById('myButtongetData').onclick=(()=>{
     let objectStore = transaction.objectStore("myObjectStore");
     let request = objectStore.getAll();
     request.onsuccess = function(event) {
-      let output = document.getElementById("output");
-      output.innerHTML = JSON.stringify(event.target.result);
-    };
+     let div =document.createElement('div')
+   let data =JSON.parse(JSON.stringify(event.target.result))
+   data.forEach(v=>{
+    let div1 =document.createElement('div')
+    div1.innerHTML=`id:${v.id} name:${v.name} age:${v.age}`
+    div.appendChild(div1)
+   })
+   document.body.appendChild(div)
+    }
 
   }
 })
