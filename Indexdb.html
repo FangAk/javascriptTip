@@ -1,0 +1,201 @@
+<!--
+ * @Author: ‘Fzz’ 
+ * @Date: 2023-04-04 16:56:57
+ * @LastEditTime: 2023-04-04 17:21:04
+ * @FilePath: \javascriptTip\index2.html
+ * @Description: Do not edit
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+
+    <!-- HTML code to create a button -->
+    <button id="myButton">Click me</button>
+    <button id="myButtoncler">Click me</button>
+    <button id="myButtongetData">Click me</button>
+
+    <script>
+  // Add event listener to the button
+  document.getElementById("myButton").addEventListener("click", function() {
+    const dbName = 'myDatabase';
+const objectStoreName = 'myObjectStore';
+
+// 先打开数据库
+const request = indexedDB.open(dbName, 1);
+
+request.onerror = function () {
+  console.log('打开数据库失败');
+};
+
+request.onsuccess = function (event) {
+  const db = event.target.result;
+  // 利用事务做一些有关数据库的操作
+  const transaction = db.transaction([objectStoreName], 'readwrite');
+  transaction.oncomplete = function () {
+    console.log('数据成功存储到 IndexedDB');
+  };
+  transaction.onerror = function () {
+    console.log('存储数据到 IndexedDB 出现错误');
+  };
+
+  // 获取存储对象
+  const objectStore = transaction.objectStore(objectStoreName);
+
+  // 存储数据  
+  const data = [
+    {
+        "id": 0,
+        "name": "Fzz0",
+        "age": 0
+    },
+    {
+        "id": 1,
+        "name": "Fzz1",
+        "age": 1
+    },
+    {
+        "id": 2,
+        "name": "Fzz2",
+        "age": 2
+    },
+    {
+        "id": 3,
+        "name": "Fzz3",
+        "age": 3
+    },
+    {
+        "id": 4,
+        "name": "Fzz4",
+        "age": 4
+    },
+    {
+        "id": 5,
+        "name": "Fzz5",
+        "age": 5
+    },
+    {
+        "id": 6,
+        "name": "Fzz6",
+        "age": 6
+    },
+    {
+        "id": 7,
+        "name": "Fzz7",
+        "age": 7
+    },
+    {
+        "id": 8,
+        "name": "Fzz8",
+        "age": 8
+    },
+    {
+        "id": 9,
+        "name": "Fzz9",
+        "age": 9
+    },
+    {
+        "id": 10,
+        "name": "Fzz10",
+        "age": 10
+    },
+    {
+        "id": 11,
+        "name": "Fzz11",
+        "age": 11
+    },
+    {
+        "id": 12,
+        "name": "Fzz12",
+        "age": 12
+    },
+    {
+        "id": 13,
+        "name": "Fzz13",
+        "age": 13
+    },
+    {
+        "id": 14,
+        "name": "Fzz14",
+        "age": 14
+    },
+    {
+        "id": 15,
+        "name": "Fzz15",
+        "age": 15
+    },
+    {
+        "id": 16,
+        "name": "Fzz16",
+        "age": 16
+    },
+    {
+        "id": 17,
+        "name": "Fzz17",
+        "age": 17
+    },
+    {
+        "id": 18,
+        "name": "Fzz18",
+        "age": 18
+    },
+    {
+        "id": 19,
+        "name": "Fzz19",
+        "age": 19
+    }
+]
+
+  data.forEach(function(datum) {
+    const request = objectStore.add(datum);
+    request.onerror = function () {
+      console.log('添加数据到 IndexedDB 出现错误');
+    };
+  });
+};
+
+request.onupgradeneeded = function (event) {
+  const db = event.target.result;
+  // 创建对象存储区
+  db.createObjectStore(objectStoreName, { keyPath: 'id' });
+};
+  });
+
+document.getElementById('myButtoncler').onclick=(()=>{
+    let request = indexedDB.open("myDatabase", 1);
+    request.onsuccess = function(event) {
+      let db = event.target.result;
+      let transaction = db.transaction(["myObjectStore"], "readwrite");
+      let objectStore = transaction.objectStore("myObjectStore");
+      let request = objectStore.clear();
+      request.onsuccess = function(event) {
+        let output = document.getElementById("output");
+        output.innerHTML = "Data cleared from database";
+      };
+    };
+})
+document.getElementById('myButtongetData').onclick=(()=>{
+  //获取存储的数据
+  let request = indexedDB.open("myDatabase", 1);
+  request.onsuccess = function(event) {
+    let db = event.target.result;
+    let transaction = db.transaction(["myObjectStore"], "readwrite");
+    let objectStore = transaction.objectStore("myObjectStore");
+    let request = objectStore.getAll();
+    request.onsuccess = function(event) {
+      let output = document.getElementById("output");
+      output.innerHTML = JSON.stringify(event.target.result);
+    };
+
+  }
+})
+</script>
+    <!-- HTML code to display the output -->
+    <div id="output"></div>
+  </body>
+</html>

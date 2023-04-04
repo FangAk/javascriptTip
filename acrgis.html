@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>HeatmapRenderer</title>
+    <link rel="stylesheet"
+      href="https://js.arcgis.com/4.16/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.16/"></script>
+
+    <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+    <script>
+require([
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/layers/GraphicsLayer",
+    "esri/Graphic",
+    "esri/geometry/Point",
+    "esri/geometry/geometryEngine",
+    "esri/tasks/support/Query",
+    "esri/core/Collection",
+    "esri/symbols/SimpleMarkerSymbol",
+], function(Map, MapView, GraphicsLayer, Graphic, Point, geometryEngine, Query, Collection, SimpleMarkerSymbol) {
+    // 定义空间参考和缓冲区距离单位
+    var SR = {
+        wkid: 3857 // Web Mercator 投影坐标系
+    };
+    var bufferUnit = "meters";
+
+    // 初始化地图和视图
+    var map = new Map({
+        basemap: "streets-navigation-vector",
+        spatialReference: SR // 设置地图空间参考
+    });
+    var view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [-122.4443, 47.2529],
+        zoom: 14,
+        spatialReference: SR // 设置视图空间参考
+    });
+
+    // 创建一个图形图层用于显示聚类点位
+    var graphicsLayer = new GraphicsLayer();
+    map.add(graphicsLayer);
+
+    // 创建点位数据
+    var points = new Collection();
+    for (var i = 0; i < 100; i++) {
+        var p = new Point({
+            longitude: Math.random() * 0.1 + -122.447,
+            latitude: Math.random() * 0.1 + 47.255,
+            spatialReference: SR // 设置点位空间参考
+        });
+        points.add(p);
+    }
+
+    // 计算点位的缓冲区
+    var bufferDist = 50;
+    var buffers = points.map(function(p) {
+        return geometryEngine.buffer(p, bufferDist, bufferUnit); // 设置缓冲区距离单位
+    });
+
+    // 构建聚类点位的查询
+    var query = new Query({
+        geometry: null,
+        outFields: [],
+        returnGeometry: true,
+        spatialRelationship: Query.SPATIAL_REL_CONTAINS
+    });
+
+    // 创建聚类点位的图形符号
+    var clusterSymbol = new SimpleMarkerSymbol({
+        style: "circle",
+        size: 20,
+        color: "red",
+        outline: {
+            color: "black",
+            width: 1
+        }
+    });
+
+    // 下一帧动画
+    var requestAnimation;
+    function animate() {
+        graphicsLayer.removeAll();
+        var extent = view.extent;
+        var visibleBuffers = buffers.filter(function(buffer) {
+            return geometryEngine.intersects(extent, buffer);
+        });
+        if (visibleBuffers.length > 0) {
+            // 计算缓冲区交集，并将结果作为查询的几何条件
+            var mergedBuffer = geometryEngine.union(visibleBuffers);
+            query.geometry = mergedBuffer;
+            pointsLayerView
+                .queryFeatures(query)
+                .then(function(results) {
+                    // 绘制聚类点位，并加入图层
+                    var clusters = results.features.length;
+                    for (var i = 0; i < clusters; i++) {
+                        var cluster = results.features[i];
+                        var clusterPoint = cluster.geometry.centroid;
+                        var clusterGraphic = new Graphic({
+                            geometry: clusterPoint,
+                            symbol: clusterSymbol
+                        });
+                        graphicsLayer.add(clusterGraphic);
+                    }
+                })
+        }
+        requestAnimation = requestAnimationFrame(animate);
+    }
+
+    // 在视图准备好之后，启动动画
+    var pointsLayerView, animationStarted = false;
+    view.whenLayerView(pointsLayer)
+        .then(function(layerView) {
+            pointsLayerView = layerView;
+            pointsLayerView.watch("updating", function(val) {
+                if (!val) {
+                    if (!animationStarted) {
+                        animationStarted = true;
+                        animate();
+                    }
+                    else {
+                        cancelAnimationFrame(requestAnimation);
+                        animate();
+                    }
+                }
+            });
+        });
+
+    // 创建点位图层，添加到地图中
+    var pointsLayer = new GraphicsLayer({
+        graphics: points.toArray().map(function(p) {
+            return new Graphic({
+                geometry: p,
+                symbol: new SimpleMarkerSymbol({
+                  color: "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16), // 随机生成颜色字符串
+                    size: 10
+                })
+            })
+        })
+    });
+    map.add(pointsLayer);
+});
+
+  </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+
+</html>

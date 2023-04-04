@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+    </body><script>
+function groupBy(list, key, sortKey, filterKey) {
+  const map = new Map();
+  for (let item of list) {
+    if (filterKey && item[filterKey] !== filterKey) {
+      continue;
+    }
+    const k = item[key];
+    if (!map.has(k)) {
+      map.set(k, []);
+    }
+    const arr = map.get(k);
+    if (arr.findIndex((x) => x === item) === -1) {
+      arr.push(item);
+    }
+  }
+  const result = [];
+  for (let [k, v] of map) {
+    if (sortKey) {
+      v.sort((a, b) => {
+        const ak = a[sortKey];
+        const bk = b[sortKey];
+        if (ak < bk) return -1;
+        if (ak > bk) return 1;
+        return 0;
+      });
+    }
+    result.push({ key: k, value: v });
+  }
+  if (sortKey) {
+    result.sort((a, b) => {
+      const ak = a.value[0][sortKey];
+      const bk = b.value[0][sortKey];
+      if (ak < bk) return -1;
+      if (ak > bk) return 1;
+      return 0;
+    });
+  }
+  return result;
+}
+const list = [
+  { name: 'apple', color: 'red', price: 5.5 },
+  { name: 'banana', color: 'yellow', price: 3.5 },
+  { name: 'cherry', color: 'red', price: 6.5 },
+  { name: 'banana', color: 'green', price: 4.5 },
+  { name: 'apple', color: 'green', price: 4.0 },
+  { name: 'cherry', color: 'red', price: 7.5 },
+];
+const res = groupBy(list, 'name', 'price');
+console.log(res);
+
+        
+    </script>
+</html>
