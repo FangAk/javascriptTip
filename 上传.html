@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+
+  </body>
+  <script>
+  function importData(dataArray) {
+  let currentIndex = 0;
+  const importNextData = function() {
+    if (currentIndex < dataArray.length) {
+      const currentData = dataArray[currentIndex];
+      // 这里是导入数据的业务逻辑处理代码
+      console.log(`正在导入第 ${currentIndex} 条数据：${currentData}`);
+      
+      // 等一定时间后导入下一条数据
+      setTimeout(() => {
+        currentIndex++;
+        importNextData();
+      }, 1000);
+    } else {
+      // 数据导入完成
+      console.log('数据导入完成');
+    }
+  };
+  
+  // 开始导入第一条数据
+  importNextData();
+}
+
+// 调用 importData 函数，并传入需要导入的数据数组
+const dataArray = ['data-1', 'data-2', 'data-3', 'data-4'];
+importData(dataArray);
+
+</script>
+</html>
